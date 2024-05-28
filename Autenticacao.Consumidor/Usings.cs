@@ -1,0 +1,9 @@
+﻿global using MassTransit;
+global using Autenticacao.Comum.InjecaoDependencia;
+global using Autenticacao.Comum.Mensagem;
+global using Autenticacao.Consumidor.Consumidor;
+global using Autenticacao.Consumidor.Definition;
+global using Microsoft.Extensions.Hosting;
+global using Autenticacao.Comum.Interfaces;
+global using Autenticacao.Comum.Services;
+global using NLog.Extensions.Logging;

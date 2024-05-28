@@ -1,0 +1,16 @@
+﻿global using System.Net;
+global using MiniValidation;
+global using Autenticacao.Comum.InjecaoDependencia;
+global using System;
+global using System.Linq;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.Extensions.DependencyInjection;
+global using MassTransit;
+global using Autenticacao.Comum.Mensagem;
+global using Autenticacao.Comum.DTO;
+global using Autenticacao.Comum.Interfaces;
+global using Autenticacao.Comum.Services;
+global using System.Net.Mime;
+global using NLog;
+global using NLog.Web;
