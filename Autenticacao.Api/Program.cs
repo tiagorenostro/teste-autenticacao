@@ -38,9 +38,10 @@ app.MapPost("/login", (LoginDto loginDto, IUsuarioService usuarioService) =>
 {
     try
     {
-        return usuarioService.EfetuarLogin(loginDto, out var mensagem) ? 
-            Results.Ok("Login efetuado com sucesso.") :
-            Results.Json(new ErroDto(mensagem), contentType: MediaTypeNames.Application.Json, 
+        var resultado = usuarioService.EfetuarLogin(loginDto);
+
+        return resultado.Sucesso ? Results.Ok("Login efetuado com sucesso.") :
+            Results.Json(new ErroDto(resultado.Mensagem), contentType: MediaTypeNames.Application.Json, 
                 statusCode: StatusCodes.Status401Unauthorized);
     }
     catch (Exception ex)
@@ -69,8 +70,10 @@ app.MapPost("/usuario/cadastrar", async (CadastroUsuarioDto cadastroUsuarioDto,
         if (!cadastroUsuarioDto.Senha.Equals(cadastroUsuarioDto.ConfirmacaoSenha))
             return Results.BadRequest(new ErroDto("Senhas não conferem."));
 
-        if (usuarioService.ExisteCadastro(cadastroUsuarioDto.Email, cadastroUsuarioDto.Celular, out var mensagem))
-            return Results.Json(new ErroDto(mensagem), contentType: MediaTypeNames.Application.Json, statusCode: StatusCodes.Status412PreconditionFailed);
+        var resultadoValidacao = usuarioService.ExisteCadastro(cadastroUsuarioDto.Email, cadastroUsuarioDto.Celular);
+
+        if (!resultadoValidacao.Sucesso)
+            return Results.Json(new ErroDto(resultadoValidacao.Mensagem), contentType: MediaTypeNames.Application.Json, statusCode: StatusCodes.Status412PreconditionFailed);
         
         var usuario = usuarioService.CriarUsuario(cadastroUsuarioDto);
 
@@ -127,9 +130,10 @@ app.MapPut("/usuario/{usuarioId:long}/ativar/{codigoAtivacao:long}", (long usuar
 {
     try
     {
-        return usuarioService.AtivarUsuario(usuarioId, codigoAtivacao, out var mensagem) ?
-            Results.Ok("Cadastro ativado com sucesso.") :
-            Results.BadRequest(new ErroDto(mensagem));
+        var resultadoValidacao = usuarioService.AtivarUsuario(usuarioId, codigoAtivacao);
+
+        return  resultadoValidacao.Sucesso ? Results.Ok("Cadastro ativado com sucesso.") :
+            Results.BadRequest(new ErroDto(resultadoValidacao.Mensagem));
     }
     catch (Exception ex)
     {
@@ -154,9 +158,10 @@ app.MapPut("/usuario/{usuarioId:long}/alterar/senha", (long usuarioId,
         if (!redefinirSenhaDto.Senha.Equals(redefinirSenhaDto.ConfirmacaoSenha))
             return Results.BadRequest(new ErroDto("Senhas não conferem."));
 
-        return usuarioService.AlterarSenha(usuarioId, redefinirSenhaDto.Senha, out var mensagem) ? 
-            Results.Ok("Senha alterada com sucesso.") :
-            Results.BadRequest(new ErroDto(mensagem));
+        var resultadoValidacao = usuarioService.AlterarSenha(usuarioId, redefinirSenhaDto.Senha);
+
+        return  resultadoValidacao.Sucesso ? Results.Ok("Senha alterada com sucesso.") :
+            Results.BadRequest(new ErroDto(resultadoValidacao.Mensagem));
     }
     catch (Exception ex)
     {

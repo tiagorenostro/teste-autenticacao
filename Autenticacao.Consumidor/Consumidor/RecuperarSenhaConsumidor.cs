@@ -14,9 +14,12 @@ public class RecuperarSenhaConsumidor(ILogger<RecuperarSenhaConsumidor> logger, 
             if (string.IsNullOrWhiteSpace(envioRecuperarSenha.Email))
                 return Task.CompletedTask;
             
-            emailService.EnviarEmail(envioRecuperarSenha.Email, Assunto, Corpo);
+            var resultadoTask = emailService.EnviarEmail(envioRecuperarSenha.Email, Assunto, Corpo);
 
-            return Task.CompletedTask;
+            if (resultadoTask.IsCompletedSuccessfully)
+                return Task.CompletedTask;
+
+            throw resultadoTask.Exception;
         }
         catch (Exception ex)
         {

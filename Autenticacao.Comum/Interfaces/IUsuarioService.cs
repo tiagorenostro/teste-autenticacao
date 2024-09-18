@@ -3,9 +3,9 @@
 public interface IUsuarioService
 {
     Usuario CriarUsuario(CadastroUsuarioDto dto);
-    bool EfetuarLogin(LoginDto loginDto, out string mensagem);
-    bool ExisteCadastro(string email, string celular, out string mensagem);
-    bool AtivarUsuario(long usuarioId, long codigoAtivacao, out string mensagem);
-    bool AlterarSenha(long usuarioId, string novaSenha, out string mensagem);
+    ResultadoValidacao EfetuarLogin(LoginDto loginDto);
+    ResultadoValidacao ExisteCadastro(string email, string celular);
+    ResultadoValidacao AtivarUsuario(long usuarioId, long codigoAtivacao);
+    ResultadoValidacao AlterarSenha(long usuarioId, string novaSenha);
     bool ExisteEmailCadastrado(string email);
 }

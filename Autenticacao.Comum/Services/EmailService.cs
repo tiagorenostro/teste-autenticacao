@@ -2,7 +2,7 @@ namespace Autenticacao.Comum.Services;
 
 public class EmailService(Configuracao.Configuracao configuracao) : IEmailService
 {
-    public void EnviarEmail(string emailPara, string assunto, string corpo)
+    public Task EnviarEmail(string emailPara, string assunto, string corpo)
     {
         using var stmpClient = new SmtpClient(configuracao.Email.Host, configuracao.Email.Porta)
         {
@@ -12,6 +12,8 @@ public class EmailService(Configuracao.Configuracao configuracao) : IEmailServic
             Credentials = new NetworkCredential(configuracao.Email.Usuario, configuracao.Email.Senha)
         };
         
-        stmpClient.Send(new MailMessage(configuracao.Email.Usuario, emailPara, assunto, corpo));
+        stmpClient.SendAsync(new MailMessage(configuracao.Email.Usuario, emailPara, assunto, corpo), null);
+
+        return Task.CompletedTask;
     }
 }

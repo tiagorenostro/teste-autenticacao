@@ -10,6 +10,7 @@ public class UsuarioService(UsuarioRepositorio usuarioRepositorio) : IUsuarioSer
     private const string MensagemCadastroJaAtivo = "Cadastro já ativo.";
     private const string MensagemCadastroNaoEncontrado = "Verifique seu login ou se você é novo por aqui, realize seu cadastro.";
     private const string MensagemCadastroNaoAtivo = "Seu cadastro não está ativo. Verifique seu e-mail.";
+    private const string MensagemSenhaInvalida = "Senha inválida.";
 
 	public Usuario CriarUsuario(CadastroUsuarioDto dto)
     {
@@ -19,10 +20,8 @@ public class UsuarioService(UsuarioRepositorio usuarioRepositorio) : IUsuarioSer
         return usuario;
     }
 
-    public bool EfetuarLogin(LoginDto loginDto, out string mensagem)
+    public ResultadoValidacao EfetuarLogin(LoginDto loginDto)
     {
-        mensagem = "";
-
         Usuario usuario = null;
         
         if (loginDto.Login.EhEmail()) 
@@ -32,88 +31,58 @@ public class UsuarioService(UsuarioRepositorio usuarioRepositorio) : IUsuarioSer
             usuario = usuarioRepositorio.ObterUsuarioPorCelular(loginDto.Login.AplicarMascara("00000-0000"));
 
         if (usuario is null)
-        {
-            mensagem = MensagemCadastroNaoEncontrado;
-            return false;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCadastroNaoEncontrado);
 
         if (usuario.Status == StatusUsuario.EmAtivacao)
-        {
-            mensagem = MensagemCadastroNaoAtivo;
-            return false;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCadastroNaoAtivo);
         
         if (!loginDto.Senha.CriptografarSenha().Equals(usuario.Senha))
-            return false;
+            return ResultadoValidacao.EmCasoErro(MensagemSenhaInvalida);
 
-        return true;
+        return ResultadoValidacao.EmCasoSucesso();
     }
     
-    public bool ExisteCadastro(string email, string celular, out string mensagem)
-    {
-        mensagem = "";
-        
+    public ResultadoValidacao ExisteCadastro(string email, string celular)
+    {        
         if (usuarioRepositorio.ExisteEmailCadastrado(email))
-        {
-            mensagem = MensagemEmailCadastrado;
-            return true;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemEmailCadastrado);
 
         if (usuarioRepositorio.ExisteCelularCadastrado(celular))
-        {
-            mensagem = MensagemCelularCadastrado;
-            return true;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCelularCadastrado);
 
-        return false;
+        return ResultadoValidacao.EmCasoSucesso();
     }
 
-    public bool AtivarUsuario(long usuarioId, long codigoAtivacao, out string mensagem)
-    {
-        mensagem = "";
-        
+    public ResultadoValidacao AtivarUsuario(long usuarioId, long codigoAtivacao)
+    {   
         var usuario = usuarioRepositorio.ObterUsuarioPorId(usuarioId);
 
         if (usuario is null)
-        {
-            mensagem = MensagemCadastradoNaoEncontradoAtivar;
-            return false;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCadastradoNaoEncontradoAtivar);
 
         if (usuario.Status == StatusUsuario.Ativo)
-        {
-            mensagem = MensagemCadastroJaAtivo;
-            return false;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCadastroJaAtivo);
 
         if (codigoAtivacao != usuario.CodigoAtivacao)
-        {
-            mensagem = MensagemCodigoAtivacaoInvalido;
-            return false;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCodigoAtivacaoInvalido);
 
         usuario.Status = StatusUsuario.Ativo;
         usuarioRepositorio.SalvarUsuario(usuario);
 
-        return true;
+        return ResultadoValidacao.EmCasoSucesso();
     }
 
-    public bool AlterarSenha(long usuarioId, string novaSenha, out string mensagem)
-    {
-        mensagem = "";
-        
+    public ResultadoValidacao AlterarSenha(long usuarioId, string novaSenha)
+    {   
         var usuario = usuarioRepositorio.ObterUsuarioPorId(usuarioId);
 
         if (usuario is null)
-        {
-            mensagem = MensagemCadastroNaoEncontradoAlterarSenha;
-            return false;
-        }
+            return ResultadoValidacao.EmCasoErro(MensagemCadastroNaoEncontradoAlterarSenha);
 
         usuario.Senha = novaSenha.CriptografarSenha();
         usuarioRepositorio.SalvarUsuario(usuario);
 
-        return true;
+        return ResultadoValidacao.EmCasoSucesso();
     }
 
     public bool ExisteEmailCadastrado(string email) => usuarioRepositorio.ExisteEmailCadastrado(email);

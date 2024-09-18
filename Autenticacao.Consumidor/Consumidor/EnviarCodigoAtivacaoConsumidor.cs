@@ -14,9 +14,12 @@ public class EnviarCodigoAtivacaoConsumidor(ILogger<EnviarCodigoAtivacaoConsumid
             if (string.IsNullOrWhiteSpace(envioCodigoAtivacao.Email))
                 return Task.CompletedTask;
 
-            emailService.EnviarEmail(envioCodigoAtivacao.Email, Assunto, string.Format(Corpo, envioCodigoAtivacao.CodigoAtivacao));
+            var resultadoTask = emailService.EnviarEmail(envioCodigoAtivacao.Email, Assunto, string.Format(Corpo, envioCodigoAtivacao.CodigoAtivacao));
 
-            return Task.CompletedTask;
+            if (resultadoTask.IsCompletedSuccessfully)
+                return Task.CompletedTask;
+
+            throw resultadoTask.Exception;
         }
         catch (Exception ex)
         {
