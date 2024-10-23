@@ -14,12 +14,12 @@ public class RecuperarSenhaConsumidor(ILogger<RecuperarSenhaConsumidor> logger, 
             if (string.IsNullOrWhiteSpace(envioRecuperarSenha.Email))
                 return Task.CompletedTask;
             
-            var resultadoTask = emailService.EnviarEmail(envioRecuperarSenha.Email, Assunto, Corpo);
+            var resultadoTask = emailService.EnviarEmailAsync(envioRecuperarSenha.Email, Assunto, Corpo);
 
-            if (resultadoTask.IsCompletedSuccessfully)
-                return Task.CompletedTask;
+            if (!resultadoTask.IsCompletedSuccessfully)
+                throw resultadoTask.Exception ?? new Exception("Ocorreu um erro ao enviar e-mail da recuperação da senha.");
 
-            throw resultadoTask.Exception;
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {

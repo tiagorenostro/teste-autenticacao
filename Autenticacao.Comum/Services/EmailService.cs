@@ -2,7 +2,7 @@ namespace Autenticacao.Comum.Services;
 
 public class EmailService(Configuracao.Configuracao configuracao) : IEmailService
 {
-    public Task EnviarEmail(string emailPara, string assunto, string corpo)
+    public Task EnviarEmailAsync(string emailPara, string assunto, string corpo)
     {
         using var stmpClient = new SmtpClient(configuracao.Email.Host, configuracao.Email.Porta)
         {

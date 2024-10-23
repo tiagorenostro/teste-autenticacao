@@ -14,12 +14,12 @@ public class EnviarCodigoAtivacaoConsumidor(ILogger<EnviarCodigoAtivacaoConsumid
             if (string.IsNullOrWhiteSpace(envioCodigoAtivacao.Email))
                 return Task.CompletedTask;
 
-            var resultadoTask = emailService.EnviarEmail(envioCodigoAtivacao.Email, Assunto, string.Format(Corpo, envioCodigoAtivacao.CodigoAtivacao));
+            var resultadoTask = emailService.EnviarEmailAsync(envioCodigoAtivacao.Email, Assunto, string.Format(Corpo, envioCodigoAtivacao.CodigoAtivacao));
 
-            if (resultadoTask.IsCompletedSuccessfully)
-                return Task.CompletedTask;
+            if (!resultadoTask.IsCompletedSuccessfully)
+                throw resultadoTask.Exception ?? new Exception("Ocorreu um erro ao enviar e-mail do código de ativação.");
 
-            throw resultadoTask.Exception;
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {
